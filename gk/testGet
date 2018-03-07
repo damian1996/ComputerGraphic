@@ -1,0 +1,12 @@
+create c 200 200
+clip c 0 0 100 100
+fill c srgb 0 1 0
+clip c 101 0 200 100
+fill c srgb 1 0 0
+clip c 0 101 100 200
+fill c srgb 1 1 0
+clip c 101 101 200 200
+fill c srgb 0 1 1
+shrink c 10
+save flagAShr.png c
+exit 0

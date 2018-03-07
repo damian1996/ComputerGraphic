@@ -29,7 +29,7 @@ int main(int argv, char** argc) {
 			line >> path;
 			line >> name;
 			op.load(path, name);
-	  	}
+	  }
 		else if(command=="save"){
 			std::string path, name;
 			line >> path;
@@ -53,11 +53,12 @@ int main(int argv, char** argc) {
 			op.fill(name, colorspace, r, g, b);
 		}
 		else if(command=="get"){
-			std::string name;
+			std::string name, colorspace;
 			int x, y;
 			line >> name;
 			line >> x >> y;
-			op.get(name, x, y);
+      line >> colorspace;
+			op.get(name, x, y, colorspace);
 		}
 		else if(command=="put"){
 			std::string name, colorspace;
@@ -81,9 +82,23 @@ int main(int argv, char** argc) {
 			line >> x1 >> y1 >> x2 >> y2;
 			op.clip(name, x1, y1, x2, y2);
 		}
+    else if(command=="shrink") {
+      std::string name;
+      int scale;
+      line >> name;
+      line >> scale;
+      op.shrink(name, scale);
+    }
+    else if(command=="merge") {
+      std::string name1, name2;
+      float weight;
+      line >> name1 >> name2;
+      line >> weight;
+      op.merge(name1, name2, weight);
+    }
 		else {
-	      std::cout << "Unknown command " << command << std::endl;
-	    }
+	    std::cout << "Unknown command " << command << std::endl;
+	  }
   }
   return 0;
 }

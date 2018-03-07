@@ -14,7 +14,6 @@ RGBColor::RGBColor(float r, float g, float b) {
 	this->b = b;
 }
 
-
 RGBColor RGBColor::clamp() const{
 	RGBColor rgb(r, g, b);
 	if(rgb.r<0) {
