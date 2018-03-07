@@ -10,7 +10,7 @@ int main(int argv, char** argc) {
   std::cout << "Program GK" << std::endl;
   std::string lines, command;
   std::vector<std::string> v;
-	Operations op;
+  Operations op;
   while (true) {
     std::getline(std::cin, lines);
     std::stringstream line(lines);
@@ -29,7 +29,7 @@ int main(int argv, char** argc) {
 			line >> path;
 			line >> name;
 			op.load(path, name);
-		}
+	  	}
 		else if(command=="save"){
 			std::string path, name;
 			line >> path;
@@ -45,11 +45,12 @@ int main(int argv, char** argc) {
 			op.create(name, szer, wys);
 		}
 		else if(command=="fill"){
-			std::string name;
+			std::string name, colorspace;
 			float r, g, b;
 			line >> name;
+			line >> colorspace;
 			line >> r >> g >> b;
-			op.fill(name, r, g, b);
+			op.fill(name, colorspace, r, g, b);
 		}
 		else if(command=="get"){
 			std::string name;
@@ -59,13 +60,14 @@ int main(int argv, char** argc) {
 			op.get(name, x, y);
 		}
 		else if(command=="put"){
-			std::string name;
+			std::string name, colorspace;
 			int x, y;
 			float r, g, b;
 			line >> name;
 			line >> x >> y;
+			line >> colorspace;
 			line >> r >> g >> b;
-			op.put(name, x, y, r, g, b);
+			op.put(name, x, y, colorspace, r, g, b);
 		}
 		else if(command=="noclip"){
 			std::string name;
@@ -81,7 +83,7 @@ int main(int argv, char** argc) {
 		}
 		else {
 	      std::cout << "Unknown command " << command << std::endl;
-	  }
-	}
+	    }
+  }
   return 0;
 }

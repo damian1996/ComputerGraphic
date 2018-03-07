@@ -1,5 +1,6 @@
 #include "assert.h"
 #include "color.h"
+#include "math.h"
 
 RGBColor::RGBColor() {
 	this->r = 0;
@@ -16,21 +17,29 @@ RGBColor::RGBColor(float r, float g, float b) {
 
 RGBColor RGBColor::clamp() const{
 	RGBColor rgb(r, g, b);
-	if(!(rgb.r>=0)) {
+	if(rgb.r<0) {
 		rgb.r = 0;
-	} else if(!(rgb.r<=1)) {
+	} else if(rgb.r>1) {
 		rgb.r = 1;
 	}
-	if(!(rgb.g>=0)) {
+	if(rgb.g<0) {
 		rgb.g = 0;
-	} else if(!(rgb.g<=1)) {
+	} else if(rgb.g>1) {
 		rgb.g = 1;
 	}
-	if(!(rgb.b>=0)) {
+	if(rgb.b<0) {
 		rgb.b = 0;
-	} else if(!(rgb.b<=1)) {
+	} else if(rgb.b>1) {
 		rgb.b = 1;
 	}
+	return rgb;
+}
+
+RGBColor RGBColor::gamma(float gam) const {
+	RGBColor rgb(r, g, b);
+	rgb.r = pow(rgb.r, gam);
+	rgb.g = pow(rgb.g, gam);
+	rgb.b = pow(rgb.b, gam);
 	return rgb;
 }
 

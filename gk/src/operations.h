@@ -16,9 +16,9 @@ public:
   void load(const std::string& path, const std::string& name);
   void save(const std::string& path, const std::string& name);
   void create(const std::string& name, int wid, int hei);
-  void put(const std::string& name, int x, int y, float r, float g, float b);
+  void put(const std::string& name, int x, int y, std::string& colorspace, float r, float g, float b);
   void get(const std::string& name, int x, int y);
-  void fill(const std::string& name, float r, float g, float b);
+  void fill(const std::string& name, std::string& colorspace, float r, float g, float b);
   void clip(const std::string& name, int x1, int y1, int x2, int y2);
   void noclip(const std::string& name);
 };

@@ -1,5 +1,5 @@
 #include "operations.h"
-
+#include <iostream>
 Operations::Operations() {
   
 }
@@ -26,12 +26,19 @@ void Operations::create(const std::string& name, int szer, int wys) {
 	windows[name] = ClippingWindow(0, images[name].width(), 0, images[name].height(), &images[name]);
 }
 
-void Operations::put(const std::string& name, int x, int y, float r, float g, float b) {
+void Operations::put(const std::string& name, int x, int y, std::string& colorspace, float r, float g, float b) {
+	RGBColor conv = RGBColor(r, g, b);
+	//std::cout << cr << std::endl;
+	if(colorspace=="lrgb") {
+		conv = conv.gamma(1.0/2.2);
+		conv = conv.clamp();
+	}
+	//std::cout << conv.r << std::endl;
 	if(includePixel(name, x, y)) {
 		RGBColor& tmp = images[name](x,y);
-		tmp.r = r;
-		tmp.g = g;
-		tmp.b = b;
+		tmp.r = conv.r;
+		tmp.g = conv.g;
+		tmp.b = conv.b;
 	}
 }
 
@@ -40,13 +47,12 @@ void Operations::get(const std::string& name, int x, int y) {
 	std::cout << "R: <" << tmp.r << "> G: <" << tmp.g << "> B: <" << tmp.b << ">" << std::endl;
 }
 
-void Operations::fill(const std::string& name, float r, float g, float b) {
+void Operations::fill(const std::string& name, std::string& colorspace, float r, float g, float b) {
 	for(int i=0; i<images[name].width(); i++) {
 		for(int j=0; j<images[name].height(); j++) {
-			put(name, i, j, r, g, b);
+			put(name, i, j, colorspace, r, g, b);
 		}
 	}
-	//images[name].clear(RGBColor(r, g, b));
 }
 
 void Operations::clip(const std::string& name, int x1, int y1, int x2, int y2) {
