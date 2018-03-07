@@ -27,14 +27,14 @@ void Operations::create(const std::string& name, int szer, int wys) {
 }
 
 void Operations::put(const std::string& name, int x, int y, std::string& colorspace, float r, float g, float b) {
-	RGBColor conv = RGBColor(r, g, b);
-	//std::cout << cr << std::endl;
-	if(colorspace=="lrgb") {
-		conv = conv.gamma(1.0/2.2);
-		conv = conv.clamp();
-	}
 	//std::cout << conv.r << std::endl;
 	if(includePixel(name, x, y)) {
+		RGBColor conv = RGBColor(r, g, b);
+		//std::cout << cr << std::endl;
+		if(colorspace=="lrgb") {
+			conv = conv.gamma(1.0/2.2);
+			conv = conv.clamp();
+		}
 		RGBColor& tmp = images[name](x,y);
 		tmp.r = conv.r;
 		tmp.g = conv.g;
