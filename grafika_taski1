@@ -1,0 +1,22 @@
+1. 
+wzory są do wyguglania, na ang wiki i chyba ograniczę się do podania że Y to luminacja i do podania tych wzorków
+https://en.wikipedia.org/wiki/CIE_1931_color_space#CIE_xy_chromaticity_diagram_and_the_CIE_xyY_color_space podac wzorki i cos o luminancji
+2.
+wg googla wynik to 11 bitów: https://www.cambridgeincolour.com/tutorials/gamma-correction.htm
+https://www.cambridgeincolour.com/tutorials/gamma-correction.htm
+3.
+chodzi o to że monitor będzie np. ustawiał jasność niebieskich pikseli na mniejszą, tu: masz fajny obrazek
+https://en.wikipedia.org/wiki/Pixel#/media/File:Closeup_of_pixels.JPG 
+http://www.eizoglobal.com/library/management/calibration/03.html
+4.
+http://www.ryanjuckett.com/programming/rgb-color-space-conversion/?start=2
+
+
+http://chemaguerra.com/cie-xyz-yxy-rgb-and-gamuts/
+http://dougkerr.net/Pumpkin/articles/CIE_XYZ.pdf
+https://www.tutorialspoint.com/dip/concept_of_bits_per_pixel.htm
+http://cg.tcs.uj.edu.pl/files/02-przestrzenie-barw.pdf
+http://rmantiuk.zut.edu.pl/data/wyklad_barwa.pdf
+
+rgb d50 = macierz x rgb d65
+

@@ -18,7 +18,7 @@ DEPS := $(SOURCES:$(srcdir)/%.cpp=$(builddir)/%.d)
 TARGET := $(outdir)/gk
 
 all: release
-.PHONY: clean all release debug 
+.PHONY: clean all release debug
 release: $(TARGET)
 debug: $(TARGET)
 

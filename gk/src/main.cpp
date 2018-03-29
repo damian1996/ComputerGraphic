@@ -5,6 +5,8 @@
 #include <sstream>
 #include <map>
 #include <string>
+#include <vector>
+#include "kernel.h"
 
 int main(int argv, char** argc) {
   std::cout << "Program GK" << std::endl;
@@ -16,7 +18,10 @@ int main(int argv, char** argc) {
     std::stringstream line(lines);
     line >> command;
     //pair<string, void(*)(stringstream&)> mapka[];
-		//a wywoływało się mapka[i](line);
+		//a wywolywalo się mapka[i](line);
+    std::string name, path, name1, name2, colorspace, type, out, in, kernel;
+    int wys, szer, x, y, x1, y1, x2, y2, scale;
+    float r, g, b, weight, val;
 
 	  if (command=="exit") {
 	    int code;
@@ -25,76 +30,78 @@ int main(int argv, char** argc) {
 	    return code;
 	  }
 	  else if(command=="load"){
-			std::string path, name;
-			line >> path;
-			line >> name;
+			line >> path >> name;
 			op.load(path, name);
 	  }
 		else if(command=="save"){
-			std::string path, name;
-			line >> path;
-			line >> name;
-			op.save(path, name);
+			line >> name >> path;
+			op.save(name, path);
 		}
 		else if(command=="create"){
-			std::string name;
-			int wys, szer;
-			line >> name;
-			line >> szer;
-			line >> wys;
+			line >> name >> szer >> wys;
 			op.create(name, szer, wys);
 		}
 		else if(command=="fill"){
-			std::string name, colorspace;
-			float r, g, b;
-			line >> name;
-			line >> colorspace;
+			line >> name >> colorspace;
 			line >> r >> g >> b;
 			op.fill(name, colorspace, r, g, b);
 		}
 		else if(command=="get"){
-			std::string name, colorspace;
-			int x, y;
-			line >> name;
-			line >> x >> y;
-      line >> colorspace;
-			op.get(name, x, y, colorspace);
+			line >> name >> x >> y; // >> colorspace;
+			op.get(name, x, y);
+			//op.get(name, x, y, colorspace);
 		}
 		else if(command=="put"){
-			std::string name, colorspace;
-			int x, y;
-			float r, g, b;
-			line >> name;
-			line >> x >> y;
-			line >> colorspace;
+			line >> name >> x >> y >> colorspace;
 			line >> r >> g >> b;
 			op.put(name, x, y, colorspace, r, g, b);
 		}
 		else if(command=="noclip"){
-			std::string name;
 			line >> name;
 			op.noclip(name);
 		}
 		else if(command=="clip"){
-			std::string name;
-			int x1, y1, x2, y2;
-			line >> name;
-			line >> x1 >> y1 >> x2 >> y2;
+			line >> name >> x1 >> y1 >> x2 >> y2;
 			op.clip(name, x1, y1, x2, y2);
 		}
     else if(command=="shrink") {
-      std::string name;
-      int scale;
-      line >> name;
-      line >> scale;
+      line >> name >> scale;
       op.shrink(name, scale);
     }
     else if(command=="merge") {
-      std::string name1, name2;
-      float weight;
-      line >> name1 >> name2;
-      line >> weight;
+      line >> name1 >> name2 >> weight;
       op.merge(name1, name2, weight);
+    }
+    else if(command=="colorsplit") {
+      line >> name >> type;
+      op.colorsplit(name, type);
+    }
+    else if(command=="compare") {
+      line >> name1 >> name2;
+      op.compare(name1, name2);
+    }
+    else if(command=="kernel") {
+      std::vector<float> vec;
+      line >> name >> x >> y;
+      for(int i=0; i<x; i++) {
+        std::getline(std::cin, lines);
+        std::stringstream line(lines);
+        for(int j=0; j<y; j++) {
+          line >> val;
+          vec.push_back(val);
+        }
+      }
+      Kernel *k = new Kernel(x, y);
+      k->fill(vec);
+      op.kernel(name, x, y, k);
+    }
+    else if(command=="gamma") {
+      line >> out >> name >> val;
+      op.gamma(out, name, val);
+    }
+    else if(command=="convolveimg") {
+      line >> out >> in >> kernel;
+      op.convolveimg(out, in, kernel);
     }
 		else {
 	    std::cout << "Unknown command " << command << std::endl;
