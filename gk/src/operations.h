@@ -1,14 +1,20 @@
 #ifndef WDGK_OPERATIONS_HEADER
 #define WDGK_OPERATIONS_HEADER
 
+#include <cmath>
 #include <iostream>
 #include <map>
-#include <cmath>
-#include <string>
+#include <memory>
 #include <sstream>
+#include <string>
+#include <vector>
+#include "Triangle.h"
+#include "Section.h"
+#include "Shape.h"
 #include "image.h"
-#include "kernel.h"
 #include "clipwindow.h"
+#include "kernel.h"
+#include "pen.h"
 
 class Operations {
 public:
@@ -25,9 +31,11 @@ public:
     {0.2126, 0.7152, 0.0722},
     {0.0193, 0.1192, 0.9505}
   };
-  std::map<std::string, Image> images;
-  std::map<std::string, ClippingWindow> windows;
+  std::map<std::string, Image*> images;
+  std::map<std::string, ClippingWindow*> windows;
   std::map<std::string, Kernel*> kernels;
+  std::map<std::string, Pen*> pens;
+  std::map<std::string, Shape*> shapes;
 	Operations();
   bool includePixel(const std::string& name, int x, int y);
   void load(const std::string& path, const std::string& name);
@@ -43,11 +51,20 @@ public:
   void merge(const std::string& name1, const std::string& name2, float weight);
   void colorsplit(const std::string& name, const std::string& type);
   void compare(const std::string& name1, const std::string& name2);
-  void kernel(const std::string& name, int x, int y, Kernel *k);
+  void kernel(const std::string& name, Kernel *k);
   void gamma(const std::string& out, const std::string& name, float val);
   void convolveimg(std::string& out, const std::string& in, const std::string& k);
   int clamp(int xp, int size);
-
+  bool clamp2(int xp, int size);
+  void haar(const std::string& in, const std::string& out);
+  void haarRec(Image* in, Image* out, int x, int y);
+  void line(const std::string& name, int x0, int y0, int x1, int y1);
+  template<int tan, int lr, int ud>
+  void drawLine(const std::string& name, int wsp[2][2], float a, float b);
+  void circle(const std::string& name, int x, int y, int r);
+  void bezier(const std::string& name, int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3);
+  void AddSection(const std::string& name, int x0, int y0, int x1, int y1);
+  void AddTriangle(const std::string& name, int x0, int y0, int x1, int y1, int x2, int y2);
 };
 
 #endif
