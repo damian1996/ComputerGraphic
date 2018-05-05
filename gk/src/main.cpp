@@ -53,9 +53,11 @@ int main(int argv, char** argc) {
 			//op.get(name, x, y, colorspace);
 		}
 		else if(command=="put"){
-			line >> name >> x >> y >> colorspace;
+      line >> name >> x >> y;
+      //line >> name >> x >> y >> colorspace;
 			line >> r >> g >> b;
-			op.put(name, x, y, colorspace, r, g, b);
+			//op.put(name, x, y, colorspace, r, g, b);
+			op.put(name, x, y, r, g, b);
 		}
 		else if(command=="noclip"){
 			line >> name;
@@ -124,9 +126,18 @@ int main(int argv, char** argc) {
     else if(command=="section") {
       line >> name >> x1 >> y1 >> x2 >> y2;
       op.AddSection(name, x1, y1, x2, y2);
-    } else if(command=="triangle") {
+    }
+    else if(command=="triangle") {
       line >> name >> x1 >> y1 >> x2 >> y2 >> x3 >> y3;
       op.AddTriangle(name, x1, y1, x2, y2, x3, y3);
+    }
+    else if(command=="fft") {
+      line >> name >> out;
+      op.fft(name, out);
+    }
+    else if(command=="ifft") {
+      line >> name >> out;
+      op.ifft(name, out);
     }
 		else {
 	    std::cout << "Unknown command " << command << std::endl;

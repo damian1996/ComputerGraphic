@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <complex>
 #include <map>
 #include <memory>
 #include <sstream>
@@ -36,12 +37,16 @@ public:
   std::map<std::string, Kernel*> kernels;
   std::map<std::string, Pen*> pens;
   std::map<std::string, Shape*> shapes;
+  typedef std::vector<std::complex<float>> zespo;
+  typedef std::complex<float> cmpDabl;
 	Operations();
+  ~Operations();
   bool includePixel(const std::string& name, int x, int y);
   void load(const std::string& path, const std::string& name);
   void save(const std::string& name, const std::string& path);
   void create(const std::string& name, int wid, int hei);
-  void put(const std::string& name, int x, int y, std::string& colorspace, float r, float g, float b);
+  void put(const std::string& name, int x, int y, float r, float g, float b);
+  //void put(const std::string& name, int x, int y, std::string& colorspace, float r, float g, float b);
   void get(const std::string& name, int x, int y);
   //void get(const std::string& name, int x, int y, const std::string& colorspace);
   void fill(const std::string& name, std::string& colorspace, float r, float g, float b);
@@ -65,6 +70,10 @@ public:
   void bezier(const std::string& name, int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3);
   void AddSection(const std::string& name, int x0, int y0, int x1, int y1);
   void AddTriangle(const std::string& name, int x0, int y0, int x1, int y1, int x2, int y2);
+  std::vector<std::complex<float>> rowsRecursiveFFT1D(zespo input, int N);
+  std::vector<std::complex<float>> rowsRevRecursiveFFT1D(zespo input, int N);
+  void fft(const std::string& in, const std::string& out);
+  void ifft(const std::string& in, const std::string& out);
 };
 
 #endif

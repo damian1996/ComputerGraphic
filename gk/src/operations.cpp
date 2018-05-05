@@ -3,6 +3,19 @@
 Operations::Operations() {
 }
 
+Operations::~Operations() {
+	for (auto const& x : pens)
+		delete x.second;
+	for (auto const& x : shapes)
+		delete x.second;
+	for (auto const& x : kernels)
+		delete x.second;
+	for (auto const& x : windows)
+		delete x.second;
+	for (auto const& x : images)
+		delete x.second;
+}
+
 bool Operations::includePixel(const std::string& name, int x, int y) {
 	if(!(x>=windows[name]->x1 && x<windows[name]->x2)) return false;
 	if(!(y>=windows[name]->y1 && y<windows[name]->y2)) return false;
@@ -12,7 +25,7 @@ bool Operations::includePixel(const std::string& name, int x, int y) {
 void Operations::load(const std::string& path, const std::string& name) {
 	images[name] = new Image();
 	images[name]->readPNG(path);
-	windows[name] = new ClippingWindow(0, images[name]->width(), 0, images[name]->height(), images[name]);
+	//windows[name] = new ClippingWindow(0, images[name]->width(), 0, images[name]->height(), images[name]);
 }
 
 void Operations::save(const std::string& name, const std::string& path) {
@@ -21,9 +34,19 @@ void Operations::save(const std::string& name, const std::string& path) {
 
 void Operations::create(const std::string& name, int szer, int wys) {
 		images[name] = new Image(szer, wys);
-		windows[name] = new ClippingWindow(0, images[name]->width(), 0, images[name]->height(), images[name]);
+		//windows[name] = new ClippingWindow(0, images[name]->width(), 0, images[name]->height(), images[name]);
 }
 
+void Operations::put(const std::string& name, int x, int y, float r, float g, float b) {
+	//if(includePixel(name, x, y)) {
+		RGBColor& tmp = (*images[name])(x,y);
+		tmp.r = r;
+		tmp.g = g;
+		tmp.b = b;
+	//}
+}
+
+/*
 void Operations::put(const std::string& name, int x, int y, std::string& colorspace, float r, float g, float b) {
 	//std::cout << conv.r << std::endl;
 	if(includePixel(name, x, y)) {
@@ -71,6 +94,7 @@ void Operations::put(const std::string& name, int x, int y, std::string& colorsp
 		tmp.b = conv.b;
 	}
 }
+*/
 
 void Operations::get(const std::string& name, int x, int y) {
 	RGBColor tmp = (*images[name])(x, y);
@@ -127,7 +151,8 @@ void Operations::get(const std::string& name, int x, int y, const std::string& c
 void Operations::fill(const std::string& name, std::string& colorspace, float r, float g, float b) {
 	for(int i=0; i<images[name]->width(); i++) {
 		for(int j=0; j<images[name]->height(); j++) {
-			put(name, i, j, colorspace, r, g, b);
+			//put(name, i, j, colorspace, r, g, b);
+			put(name, i, j, r, g, b);
 		}
 	}
 }
@@ -312,7 +337,6 @@ void Operations::haarRec(Image* in, Image* out, int x, int y) {
 		haarRec(in, out, x/2, y/2);
 }
 
-
 void Operations::line(const std::string& name, int x0, int y0, int x1, int y1) {
 		float a = -2*(y1-y0), b = 2*(x1-x0);
 		float nachylenie = -a/b;
@@ -421,3 +445,165 @@ void Operations::AddSection(const std::string& name, int x0, int y0, int x1, int
 void Operations::AddTriangle(const std::string& name, int x0, int y0, int x1, int y1, int x2, int y2) {
 		shapes[name] = new Triangle(x0, y0, x1, y1, x2, y2);
 }
+
+std::vector<std::complex<float>> Operations::rowsRecursiveFFT1D(zespo input, int N) {
+	int Nprim = N/2;
+	if(N==1) return input;
+	cmpDabl omegaN = std::exp(cmpDabl(0.0, 1.0*(-2*M_PI)/N));
+	cmpDabl omega(1.0, 0.0);
+	zespo in0, in1;
+	in0.resize(Nprim);
+	in1.resize(Nprim);
+
+	for(int i=0; i<N; i++) {
+		i%2==0 ? in0[i/2] = input[i] : in1[i/2] = input[i];
+	}
+	in0 = rowsRecursiveFFT1D(in0, Nprim);
+	in1 = rowsRecursiveFFT1D(in1, Nprim);
+	for(int i=0; i<Nprim; i++) {
+		input[i] = in0[i] + omega*in1[i];
+		input[i+Nprim] = in0[i] - omega*in1[i];
+		omega = omega*omegaN;
+	}
+	return input;
+}
+
+std::vector<std::complex<float>> Operations::rowsRevRecursiveFFT1D(zespo input, int N) {
+	int Nprim = N/2;
+	if(N==1) return input;
+	cmpDabl omegaN = std::exp(cmpDabl(0.0, 1.0*(2*M_PI)/N));
+	cmpDabl omega(1.0, 0.0);
+	zespo in0, in1;
+	in0.resize(N);
+	in1.resize(N);
+
+	for(int i=0; i<N; i++) {
+		i%2==0 ? in0[i/2] = input[i] : in1[i/2] = input[i];
+	}
+	in0 = rowsRevRecursiveFFT1D(in0, Nprim);
+	in1 = rowsRevRecursiveFFT1D(in1, Nprim);
+	for(int i=0; i<Nprim; i++) {
+		input[i] = in0[i] + omega*in1[i];
+		input[i+Nprim] = in0[i] - omega*in1[i];
+		omega = omega*omegaN;
+	}
+	return input;
+}
+
+
+void Operations::fft(const std::string& in, const std::string& out) {
+		int N = (*images[in]).width();
+		images[out] = new Image(N, N);
+
+		zespo input[N];
+		for(int i=0; i<N; i++) {
+				input[i].resize(N);
+				for(int j=0; j<N; j++)
+						input[i][j] = cmpDabl((*images[in])(i, j).r, 0);
+				input[i] = rowsRecursiveFFT1D(input[i], N);
+		}
+		for(int i=0; i<N; i++) {
+				zespo output;
+				output.resize(N);
+				for(int j=0; j<N; j++)
+						output[j] = input[j][i];
+
+				output = rowsRecursiveFFT1D(output, N);
+				for(int j=0; j<N; j++) {
+						RGBColor& outPixel = (*images[out])(j, i);
+						outPixel.r = std::real(output[j])/N;
+						outPixel.g = std::imag(output[j])/N;
+						outPixel.b = 0.0f/N;
+				}
+		}
+}
+
+void Operations::ifft(const std::string& in, const std::string& out) {
+		int N = (*images[in]).width();
+		images[out] = new Image(N, N);
+
+		zespo input[N];
+		for(int i=0; i<N; i++) {
+				input[i].resize(N);
+				for(int j=0; j<N; j++)
+						input[i][j] = cmpDabl((*images[in])(i, j).r, (*images[in])(i, j).g);
+				input[i] = rowsRevRecursiveFFT1D(input[i], N);
+		}
+		for(int i=0; i<N; i++) {
+				zespo output;
+				output.resize(N);
+				for(int j=0; j<N; j++)
+						output[j] = input[j][i];
+
+				output = rowsRevRecursiveFFT1D(output, N);
+				for(int j=0; j<N; j++) {
+						RGBColor& outPixel = (*images[out])(j, i);
+						float val = std::real(output[j])/N;
+						outPixel.r = val;
+						outPixel.g = val;
+						outPixel.b = val;
+				}
+		}
+}
+
+/*
+//NAIVE
+void Operations::fft(const std::string& in, const std::string& out) {
+	int N = (*images[in]).width();
+	images[out] = new Image(N, N);
+	float pi = (-2*M_PI)/N;
+	for(int k=0; k<N; k++) {
+		for(int l=0; l<N; l++) {
+			cmpDabl sum(0.0, 0.0);
+
+			for(int x=0; x<N; x++) {
+				cmpDabl sumVal(0.0, 0.0);
+				for(int y=0; y<N; y++) {
+					RGBColor color = (*images[in])(x, y);
+					cmpDabl i(0.0,1.0);
+					i *= (pi*l*y);
+					sumVal += (cmpDabl(color.r, 0.0)*std::exp(i));
+				}
+				cmpDabl j(0.0,1.0);
+				j *= (pi*k*x);
+				sum += (sumVal*std::exp(j));
+			}
+			RGBColor& outPixel = (*images[out])(k, l);
+			outPixel.r = std::real(sum)/N;
+			outPixel.g = std::imag(sum)/N;
+			outPixel.b = 0.0f/N;
+		}
+	}
+}
+
+void Operations::ifft(const std::string& in, const std::string& out) {
+	int N = (*images[in]).width();
+	images[out] = new Image(N, N);
+	float pi = (2*M_PI)/N;
+
+	for(int k=0; k<N; k++) {
+		for(int l=0; l<N; l++) {
+			cmpDabl sum(0.0, 0.0);
+
+			for(int x=0; x<N; x++) {
+				cmpDabl sumVal(0.0, 0.0);
+				for(int y=0; y<N; y++) {
+					RGBColor color = (*images[in])(x, y);
+					cmpDabl i(0.0,1.0);
+					i *= (pi*l*y);
+					sumVal += (cmpDabl(color.r, color.g)*std::exp(i));
+				}
+				cmpDabl j(0.0,1.0);
+				j *= (pi*k*x);
+				sum += (sumVal*std::exp(j));
+			}
+			RGBColor& outPixel = (*images[out])(k, l);
+			float val = std::real(sum)/N;
+			outPixel.r = val;
+			outPixel.g = val;
+			outPixel.b = val;
+		}
+	}
+}
+
+*/
