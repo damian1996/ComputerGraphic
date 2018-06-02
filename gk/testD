@@ -1,0 +1,33 @@
+create I 200 200
+fill I 0 0 0
+pen color P 1 1 1
+pen color Q 1 1 0
+pen color R 0 0 1
+polygonobj poly 16
+111 89
+121 10
+100 51
+80 10
+89 89
+10 80
+51 100
+10 121
+89 111
+81 190
+100 149
+120 190
+111 111
+190 120
+148 100
+190 80
+draw I P poly
+rotate R 1.57079633
+translate T 198 2
+transform poly R poly
+transform poly T poly
+shear Sh 0.0933 0
+transform poly Sh polysh
+draw I Q poly
+draw I R polysh
+save I poly.png
+exit 0

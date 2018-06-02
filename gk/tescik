@@ -1,4 +1,0 @@
-load img.png cats
-fft cats F
-ifft F R2
-exit 0

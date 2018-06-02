@@ -1,0 +1,8 @@
+rotate R 1.57079633
+translate T 198 2
+transform poly R poly
+transform poly T poly
+shear Sh 0.0933 0
+transform poly Sh polysh
+draw I Q poly
+draw I R polysh

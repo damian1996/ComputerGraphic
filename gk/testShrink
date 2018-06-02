@@ -1,7 +1,0 @@
-load szachownica.png sz2
-shrink sz2 2
-save sz2.png sz2
-load szachownica.png sz4
-shrink sz4 4
-save sz4.png sz4
-exit

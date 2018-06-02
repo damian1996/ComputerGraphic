@@ -9,6 +9,10 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <utility>
+#include <string>
+#include <functional>
+
 #include "Triangle.h"
 #include "Section.h"
 #include "Shape.h"
@@ -16,6 +20,8 @@
 #include "clipwindow.h"
 #include "kernel.h"
 #include "pen.h"
+#include "Polygon.h"
+#include "Matrix.h"
 
 class Operations {
 public:
@@ -37,6 +43,8 @@ public:
   std::map<std::string, Kernel*> kernels;
   std::map<std::string, Pen*> pens;
   std::map<std::string, Shape*> shapes;
+  std::map<std::string, Polygon*> polygons;
+  std::map<std::string, Matrix*> matrices;
   typedef std::vector<std::complex<float>> zespo;
   typedef std::complex<float> cmpDabl;
 	Operations();
@@ -49,7 +57,8 @@ public:
   //void put(const std::string& name, int x, int y, std::string& colorspace, float r, float g, float b);
   void get(const std::string& name, int x, int y);
   //void get(const std::string& name, int x, int y, const std::string& colorspace);
-  void fill(const std::string& name, std::string& colorspace, float r, float g, float b);
+  //void fill(const std::string& name, std::string& colorspace, float r, float g, float b);
+  void fill(const std::string& name, float r, float g, float b);
   void clip(const std::string& name, int x1, int y1, int x2, int y2);
   void noclip(const std::string& name);
   void shrink(const std::string& name, int n);
@@ -63,9 +72,9 @@ public:
   bool clamp2(int xp, int size);
   void haar(const std::string& in, const std::string& out);
   void haarRec(Image* in, Image* out, int x, int y);
-  void line(const std::string& name, int x0, int y0, int x1, int y1);
+  void line(Image* img, int x0, int y0, int x1, int y1, Pen* pen);
   template<int tan, int lr, int ud>
-  void drawLine(const std::string& name, int wsp[2][2], float a, float b);
+  void drawLine(Image* temp, int* wsp, Pen* pen);
   void circle(const std::string& name, int x, int y, int r);
   void bezier(const std::string& name, int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3);
   void AddSection(const std::string& name, int x0, int y0, int x1, int y1);
@@ -74,6 +83,16 @@ public:
   std::vector<std::complex<float>> rowsRevRecursiveFFT1D(zespo input, int N);
   void fft(const std::string& in, const std::string& out);
   void ifft(const std::string& in, const std::string& out);
+  void polygon(const std::string& name, const std::string& pen, int n, const std::vector<std::pair<int, int>>& v);
+  void addPen(const std::string& name, float r, float g, float b);
+  float noise(int x, int y, int z);
+  void polygonobj(const std::string& name, int n, const std::vector<std::pair<double, double>>& v);
+  void draw(const std::string& image, const std::string& pen, const std::string& namePolygon);
+  void translate(const std::string& name, double x, double y);
+  void scale(const std::string& name, double x, double y);
+  void shear(const std::string& name, double x, double y);
+  void rotate(const std::string& name, double angle);
+  void transform(const std::string& name1, const std::string& affine, const std::string& name2);
 };
 
 #endif

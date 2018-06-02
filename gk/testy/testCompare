@@ -1,0 +1,37 @@
+load tcs1.png tcs1
+load tcs-noise1.png tcsNoise1
+compare tcs1 tcsNoise1
+exit
+
+
+
+load tcs1.png img1
+kernel smooth 3 3 0.0625 0.125 0.0625 0.125 0.25 0.125 0.0625 0.125 0.0625
+kernel edge 3 3 1 0 -1 1 0 -1 1 0 -1
+convolveimg img2 img1 smooth
+convolveimg img3 img2 edge
+save img3 tcse.png
+get img3 0 0
+get img3 724 800
+get img3 1451 795
+get img3 1453 802
+exit 0
+
+
+
+kernel smooth 3 3
+0.0625 0.125 0.0625
+ 0.125  0.25  0.125
+0.0625 0.125 0.0625
+kernel edge 3 3
+1 0 -1
+1 0 -1
+1 0 -1
+convolveimg img2 img1 smooth
+convolveimg img3 img2 edge
+save img3 tcse.png
+get img3 0 0
+get img3 724 800
+get img3 1451 795
+get img3 1453 802
+exit 0

@@ -1,0 +1,17 @@
+create I 200 200
+fill I 0 0 0
+pen color P 1 1 0
+polygon I P 8
+0 0
+50 0
+55 27
+12 39
+25 29
+36 24
+33 3
+19 16
+save I line.png
+exit 0
+
+
+compare line.png line_angela.png -compose src diff.png

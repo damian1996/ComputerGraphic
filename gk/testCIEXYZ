@@ -1,9 +1,0 @@
-create a 100 100
-clip a 0 0 20 50
-fill a xyz 0.6400 0.3300 0.03
-clip a 20 0 40 50
-fill a xyz 0.3000 0.6000 0.1
-clip a 40 0 60 50
-fill a xyz 0.1500 0.0600 0.79
-save t4.png a
-exit 0

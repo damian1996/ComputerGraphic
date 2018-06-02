@@ -1,8 +1,0 @@
-load before.png jeden
-load kostka.png dwa
-merge jeden dwa 0.4
-save merge.png jeden
-load lrgb.png tsy 
-merge jeden tsy 0.124
-save merge2.png jeden
-exit

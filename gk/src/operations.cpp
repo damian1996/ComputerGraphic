@@ -148,13 +148,18 @@ void Operations::get(const std::string& name, int x, int y, const std::string& c
 }
 */
 
-void Operations::fill(const std::string& name, std::string& colorspace, float r, float g, float b) {
+//void Operations::fill(const std::string& name, std::string& colorspace, float r, float g, float b) {
+void Operations::fill(const std::string& name, float r, float g, float b) {
+	RGBColor col(r, g, b);
+	images[name]->clear(col);
+	/*
 	for(int i=0; i<images[name]->width(); i++) {
 		for(int j=0; j<images[name]->height(); j++) {
 			//put(name, i, j, colorspace, r, g, b);
 			put(name, i, j, r, g, b);
 		}
 	}
+	*/
 }
 
 void Operations::clip(const std::string& name, int x1, int y1, int x2, int y2) {
@@ -247,9 +252,9 @@ void Operations::compare(const std::string& name1, const std::string& name2) {
 			}
 		}
 		sum = sum/(3*n*k);
-		printf("MSE %f\n", sum);
+		//printf("MSE %f\n", sum);
 		float psnr = 10*log10(1.0/sum);
-		printf("PSNR %f\n", psnr);
+		//printf("PSNR %f\n", psnr);
 }
 
 void Operations::kernel(const std::string& name, Kernel* k) {
@@ -309,7 +314,6 @@ void Operations::haar(const std::string& in, const std::string& out) {
 	 Image* inImg = images[in];
 	 haarRec(inImg, outImg, imgX, imgY);
 
-
 	 images[out] = outImg;
 }
 
@@ -330,86 +334,12 @@ void Operations::haarRec(Image* in, Image* out, int x, int y) {
 			}
 			for(int j=0; j<y; j++) {
 				RGBColor& col = (*in)(i, j);
-
 			}
 		}
 		if(x==0 && y==0) return;
 		haarRec(in, out, x/2, y/2);
 }
 
-void Operations::line(const std::string& name, int x0, int y0, int x1, int y1) {
-		float a = -2*(y1-y0), b = 2*(x1-x0);
-		float nachylenie = -a/b;
-		int wsp[2][2] = {{x0, y0}, {x1, y1}};
-
-		if(fabs(nachylenie) <= 1) {
-				if(x0<x1) {
-						if(y0 < y1) {
-								drawLine<0, 0, 1>(name, wsp, a, b);
-						} else {
-								drawLine<0, 0, -1>(name, wsp, a, b);
-						}
-				} else { //(x0 >= x1) {
-						if(y0 < y1) {
-								drawLine<0, 1, 1>(name, wsp, a, b);
-						} else {
-								drawLine<0, 1, -1>(name, wsp, a, b);
-						}
-				}
-		} else {
-				if(y0<y1) {
-						if(x0 < x1) {
-								drawLine<1, 0, 1>(name, wsp, a, b);
-						} else {
-								drawLine<1, 0, -1>(name, wsp, a, b);
-						}
-				} else { //if(y0 > y1) {
-						if(x0 < x1) {
-								drawLine<1, 1, 1>(name, wsp, a, b);
-						} else {
-								drawLine<1, 1, -1>(name, wsp, a, b);
-						}
-				}
-		}
-}
-
-// tan - pochodna <= 1 lub nie
-// lr - idzie w prawo czy w lewo wzgledem osi kierujacej
-// ud - w gore czy w dol wzgledem osi kierujacej
-template<int tan, int lr, int ud>
-void Operations::drawLine(const std::string& name, int wsp[2][2], float a, float b) {
-	// (0,0) = x0 , (0,1) = y0, (1,0) = x1, (1,1) = y1
- 	(*images[name])(wsp[0][0], wsp[0][1]) = RGBColor(1, 1, 1);
-	//(*images[name])(wsp[1][0], wsp[1][1]) = RGBColor(1, 1, 1);
-	int wid = (*images[name]).width();
-	int hei = (*images[name]).height();
-
-	if(wsp[0][0]>wid) wsp[0][0] = wid;
-	if(wsp[1][0]>wid) wsp[1][0] = wid;
-	if(wsp[0][1]>hei) wsp[0][1] = hei;
-	if(wsp[1][1]>hei) wsp[1][1] = hei;
-
-
-	float F_M1 = a + (1/2)*b;
-	int lr2 = (lr==0)?1:0;
-	int tan2 = (tan==0)?1:0;
-	wsp[lr][tan]++;
-	for(; wsp[lr][tan] < wsp[lr2][tan]; wsp[lr][tan]++) // i=x0; i<x1; i++
-	{
-		 //x0++;
-		 if(F_M1 < 0)
-		 {
-			 //y0++;
-			 wsp[lr][tan2] += ud;
-			 F_M1 += (a + b);
-		 }
-		 else if(F_M1 >= 0)
-		 {
-			 F_M1 += a;
-		 }
-		 (*images[name])(wsp[lr][tan], wsp[lr][tan2]) = RGBColor(1, 1, 1);
-	}
-}
 
 void Operations::circle(const std::string& name, int x, int y, int r) {
 	int x0 = x-r, y0 = y-r;
@@ -433,7 +363,7 @@ void Operations::bezier(const std::string& name, int x0, int y0, int x1, int y1,
 		dc.push_back(tab[5]);
 	}
 	for(int i=0; i<15; i++) {
-		line(name, dc[i].first, dc[i].second, dc[i+1].first, dc[i+1].second);
+		//line(name, dc[i].first, dc[i].second, dc[i+1].first, dc[i+1].second);
 	}
 }
 
@@ -546,6 +476,134 @@ void Operations::ifft(const std::string& in, const std::string& out) {
 		}
 }
 
+void Operations::line(Image* img, int x0, int y0, int x1, int y1, Pen* pen) {
+		int wsp[4] = {x0, y0, x1, y1};
+		if(abs(y1-y0) <= abs(x1-x0)) { // X wiodaca osia (-a/b <= 1)
+				if(x0<=x1) { // +X
+						if(y0 <= y1) { // y++
+								drawLine<0, 0, 1>(img, wsp, pen);
+						} else { // y--
+								drawLine<0, 0, -1>(img, wsp, pen);
+						}
+				} else { // -X
+						if(y0 <= y1) {
+								drawLine<0, 1, 1>(img, wsp, pen);
+						} else {
+								drawLine<0, 1, -1>(img, wsp, pen);
+						}
+				}
+		} else { // Y wiodaca
+				if(y0<=y1) { // +Y
+						if(x0 <= x1) { // x++
+								drawLine<1, 0, 1>(img, wsp, pen);
+						} else { // x--
+								drawLine<1, 0, -1>(img, wsp, pen);
+						}
+				} else { // -Y
+						if(x0 <= x1) {
+								drawLine<1, 1, 1>(img, wsp, pen);
+						} else {
+								drawLine<1, 1, -1>(img, wsp, pen);
+						}
+				}
+		}
+}
+
+// tan (pochodna <= 1 lub nie) -> 0 (wiodacy X), 1 (wiodacy Y)
+// lr - idzie w prawo czy w lewo wzgledem osi kierujacej -> +X/+Y -> 0, -X/-Y -> 1
+// ud - w gore czy w dol wzgledem osi kierujacej // y++/x++ -> 1, y--/x-- -> -1
+template<int tanx, int lr, int ud>
+void Operations::drawLine(Image* temp, int* wsp, Pen* pen) {
+	RGBColor p = *(pen->col);
+	int a, b;
+	(*temp)(wsp[0], wsp[1]) = p;
+
+
+	int tan2 = (tanx==0) ? 1 : 0;
+	int lr2 = (lr==0) ? 1 : 0;
+	int sign = (lr==1) ? -1 : 1;
+
+	int j = wsp[lr*2 + tan2];
+	int k = wsp[lr2*2 + tanx];
+
+	if(tanx) {
+		a = -2*abs(wsp[2]-wsp[0]);
+		b = 2*abs(wsp[3]-wsp[1]);
+	} else {
+		a = -2*abs(wsp[3]-wsp[1]);
+		b = 2*abs(wsp[2]-wsp[0]);
+	}
+
+	int F_M1 = a + (b>>1);
+
+	for(int i = wsp[lr*2+tanx]+1; i < k; i++)
+	{
+		 if(F_M1 <= 0)
+		 {
+			 j = j + sign*ud;
+			 F_M1 += (a + b);
+		 }
+		 else
+			 F_M1 += a;
+
+		 if(tanx)
+			 (*temp)(j, i) = p;
+		 else
+			 (*temp)(i, j) = p;
+	 }
+}
+
+void Operations::polygon(const std::string& name, const std::string& pen, int n, const std::vector<std::pair<int, int>>& v) {
+	Image* img = images[name];
+	Pen* p = pens[pen];
+	#pragma omp parallel for
+	for(int i=0; i<n-1; i++) {
+		line(img, v[i].first, v[i].second, v[i+1].first, v[i+1].second, p);
+	}
+	line(img, v[n-1].first, v[n-1].second, v[0].first, v[0].second, p);
+}
+
+void Operations::addPen(const std::string& name, float r, float g, float b) {
+		pens[name] = new Pen(r, g, b);
+}
+
+float Operations::noise(int x, int y, int z) {
+		// std::hash
+}
+
+void Operations::polygonobj(const std::string& name, int n, const std::vector<std::pair<double, double>>& vertices) {
+		polygons[name] = new Polygon(n, vertices);
+}
+
+void Operations::draw(const std::string& image, const std::string& pen, const std::string& namePolygon) {
+		polygons[namePolygon]->draw(images[image], pens[pen]);
+}
+
+void Operations::translate(const std::string& name, double x, double y) {
+		std::vector<double> mat = {1, 0, x, 0, 1, y, 0, 0, 1};
+		matrices[name] = new Matrix(3, 3, mat);
+}
+
+void Operations::scale(const std::string& name, double x, double y) {
+		std::vector<double> mat = {x, 0, 0, 0, y, 0, 0, 0, 1};
+		matrices[name] = new Matrix(3, 3, mat);
+}
+
+void Operations::shear(const std::string& name, double x, double y) {
+		std::vector<double> mat = {1, x, 0, y, 1, 0, 0, 0, 1};
+		matrices[name] = new Matrix(3, 3, mat);
+}
+
+void Operations::rotate(const std::string& name, double angle) {
+		std::vector<double> mat = {cos(angle), -sin(angle), 0, sin(angle), cos(angle), 0, 0, 0, 1};
+		matrices[name] = new Matrix(3, 3, mat);
+}
+
+void Operations::transform(const std::string& name1, const std::string& affine, const std::string& name2) {
+		polygons[name2] = polygons[name1]->transform(matrices[affine]);
+		//polygons[name2] = dynamic_cast<Polygon*>(sh);
+}
+
 /*
 //NAIVE
 void Operations::fft(const std::string& in, const std::string& out) {
@@ -605,5 +663,4 @@ void Operations::ifft(const std::string& in, const std::string& out) {
 		}
 	}
 }
-
 */

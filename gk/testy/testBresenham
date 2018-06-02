@@ -1,0 +1,7 @@
+create bezier 200 200
+fill bezier lrgb 0 0 0
+save bezier bresenham.png
+line bezier 50 50 70 60
+bezier bezier 10 10 20 20 30 20 40 10
+save bezier bezier.png
+exit

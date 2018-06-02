@@ -1,0 +1,4 @@
+fill bresen lrgb 0.0 0.0 0.0
+save bresenham.png bresen
+line bresen 10 10 20 16
+save bresenhamWithLine.png bresen

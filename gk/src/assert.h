@@ -31,6 +31,7 @@ class NullAssert {
       inline NullAssert& operator<<(const T& message) { return *this; }
 };
 
+#define NDEBUG
 #ifndef NDEBUG
 #define assert(cond) Assert(cond) << "Assertion failure at " << __FILE__ << ":" << __LINE__ << " -- "
 #define release_assert(cond) Assert(cond) << "Fatal error at at " << __FILE__ << ":" << __LINE__ << " -- "
